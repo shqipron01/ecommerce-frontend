@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
-import Layout from '../common/Layout/';
+import Layout from '../common/Layout';
+
 import { useForm } from 'react-hook-form';
 import { apiUrl } from '../common/http';
 import { toast } from 'react-toastify';
@@ -8,35 +9,35 @@ import { AdminAuthContext } from '../context/AdminAuth';
 
 const Login = () => {
     const { login } = useContext(AdminAuthContext);
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { register, handleSubmit, watch, formState: { errors }, } = useForm();
     const navigate = useNavigate();
 
     const onSubmit = async (data) => {
         console.log(data);
 
-        const response = await fetch(`${apiUrl}/admin/login`, {
+        const res = await fetch(`${apiUrl}/admin/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(data)
-        });
+        }).then(res => res.json())
+            .then(result => {
+            console.log(result)
 
-        const result = await response.json();
-        console.log(result);
-
-        if (result.status === 200) {
-            const adminInfo = {
-                token: result.token,
-                id: result.id,
-                name: result.name
-            };
-            localStorage.setItem('adminInfo', JSON.stringify(adminInfo));
-            login(adminInfo);
-            navigate('/admin/dashboard');
-        } else {
-            toast.error(result.message);
-        }
+            if (result.status === 200) {
+                const adminInfo = {
+                    token: result.token,
+                    id: result.id,
+                    name: result.name
+                };
+                localStorage.setItem('adminInfo', JSON.stringify(adminInfo));
+                login(adminInfo);
+                navigate('/admin/dashboard');
+            } else {
+                toast.error(result.message);
+            }
+        })
     };
 
     return (
@@ -48,7 +49,7 @@ const Login = () => {
                             <h3>Admin Login</h3>
 
                             <div className='mb-3'>
-                                <label htmlFor="email" className='form-label'>Email</label>
+                                <label htmlFor="" className='form-label'>Email</label>
                                 <input
                                     type="email"
                                     {
@@ -60,10 +61,12 @@ const Login = () => {
                                             }
                                         })
                                     }
-                                    className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                                    className={`form-control ${errors.email && 'is-invalid'}`}
                                     placeholder='Enter your email'
                                 />
-                                {errors.email && <p className='invalid-feedback'>{errors.email?.message}</p>}
+                                { typeof errors.email?.message === 'string' && 
+                                    <p className='invalid-feedback'>{errors.email.message}</p>
+                                }
                             </div>
 
                             <div className='mb-3'>
@@ -71,10 +74,12 @@ const Login = () => {
                                 <input
                                     type="password"
                                     {...register("password", { required: "The password is required." })}
-                                    className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                                    className={`form-control ${errors.password && 'is-invalid'}`}
                                     placeholder='Enter your password'
                                 />
-                                {errors.password && <p className='invalid-feedback'>{errors.password?.message}</p>}
+                                { typeof errors.password?.message ==='string' && 
+                                    <p className='invalid-feedback'>{errors.password?.message}</p>
+                                }
                             </div>
 
                             <button className='btn btn-secondary'>Login</button>
@@ -87,5 +92,9 @@ const Login = () => {
 };
 
 export default Login;
+
+function then(arg0) {
+    throw new Error('Function not implemented.');
+}
 // import React from 'react'
 // import Layout from '../common/Layout/';

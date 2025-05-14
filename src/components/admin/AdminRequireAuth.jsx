@@ -6,7 +6,7 @@ export const AdminRequireAuth = ({ children }) => {
     const {user} = useContext(AdminAuthContext);
 
     if (!user){
-        return <Navigate to={"/admin/login"} />
+        return <Navigate to={`/admin/login`} />
     }
 
     return children;

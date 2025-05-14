@@ -4,8 +4,8 @@ export const AdminAuthContext = createContext();
 
 export const AdminAuthProvider = ({ children }) => {
     const storedAdminInfo = localStorage.getItem('adminInfo');
-    const [user, setUser] = useState(storedAdminInfo ? JSON.parse(storedAdminInfo) : null);
-
+    const [user, setUser] = useState(storedAdminInfo);
+    
     const login = (user) => {
         setUser(user);
     };
