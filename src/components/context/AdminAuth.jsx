@@ -1,5 +1,6 @@
 import { createContext, useState } from "react";
 
+// @ts-ignore
 export const AdminAuthContext = createContext();
 
 export const AdminAuthProvider = ({ children }) => {
@@ -21,4 +22,3 @@ export const AdminAuthProvider = ({ children }) => {
         </AdminAuthContext.Provider>
     );
 };
-// // import React from 'react'

@@ -13,7 +13,6 @@ const Login = () => {
     const navigate = useNavigate();
 
     const onSubmit = async (data) => {
-        console.log(data);
 
         const res = await fetch(`${apiUrl}/admin/login`, {
             method: 'POST',
@@ -23,8 +22,6 @@ const Login = () => {
             body: JSON.stringify(data)
         }).then(res => res.json())
             .then(result => {
-            console.log(result)
-
             if (result.status === 200) {
                 const adminInfo = {
                     token: result.token,
@@ -96,5 +93,3 @@ export default Login;
 function then(arg0) {
     throw new Error('Function not implemented.');
 }
-// import React from 'react'
-// import Layout from '../common/Layout/';
