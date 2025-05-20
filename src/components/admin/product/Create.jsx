@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef,useMemo } from 'react'
 import Layout from '../../common/Layout'
 import { Link, useNavigate } from 'react-router-dom'
 import Sidebar from '../../common/Sidebar'
-import { useForm } from 'react-hook-form'
+import { set, useForm } from 'react-hook-form'
 import { adminToken, apiUrl } from '../../common/http'
 import { toast } from 'react-toastify'
 import JoditEditor from 'jodit-react'
@@ -28,7 +28,7 @@ const Create = ({placeholder}) => {
   const { register, handleSubmit,setError, watch, formState: { errors }, } = useForm();
 
   const saveProduct = async (data)=>{
-    const formData = {...data, "description": content}
+    const formData = {...data, "description": content, "gallery": gallery}
     setDisable(true)
     const res = await fetch(`${apiUrl}/products`,{
       method: 'POST',
@@ -82,7 +82,37 @@ const Create = ({placeholder}) => {
       setBrands(result.data)
     })
   }
+  
+  const handleFile =async (e) => {
+    const formData = new FormData();
+    const file = e.target.files[0];
+    formData.append('image', file);
+    setDisable(true)
 
+    const res = await fetch(`${apiUrl}/temp-images`,{
+      method: 'POST',
+      headers: {
+        'Accept' : 'application/json',
+        'Authorization' : `Bearer ${adminToken()}`
+      },
+      body: formData
+    })
+    .then(res => res.json())
+    .then(result=> {
+      gallery.push(result.data.id); 
+      setGallery(gallery)
+
+      galleryImages.push(result.data.image_url);
+      setGalleryImages(galleryImages)
+      setDisable(false)
+      e.target.value = ""
+    })
+  }
+
+  const deleteImage = async (image) => {
+    const newGallery = galleryImages.filter(gallery=> gallery !== image);
+    setGalleryImages(newGallery)
+  }
   useEffect(() => {
     fetchCategories();
     fetchBrands();
@@ -322,8 +352,29 @@ const Create = ({placeholder}) => {
                   <h3 className='py-3 border-bottom mb-3'>Gallery</h3>
                   <div className='mb-3'>
                     <label htmlFor="" className='form-label'>Image</label>
-                    <input type="file" className='form-control' />
+                    <input 
+                    onChange={handleFile}
+                    type="file" className='form-control' />
                   </div>
+
+                  <div className='mb-3'>
+                    <div className='row'>
+                      {
+                        galleryImages && galleryImages.map(image, index =>{
+                          return(
+                            <div className='col-md-3' key={`image-${index}`}>
+                              <div className ='card shadow'>
+                                <img src={image} alt="" className='w-100' />
+                                <button className='btn btn-danger' onClick={() => deleteImage(image)}>Delete</button>
+                              </div>
+                            </div>
+                          )
+                        })
+                      }
+
+                    </div>
+
+                   </div> 
                                                  
                 </div>
               </div>

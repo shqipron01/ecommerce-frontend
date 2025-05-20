@@ -77,13 +77,16 @@ const Show = () => {
                               {
                                  products.map(product => {
                                     return(
-                                       <tr>
+                                       <tr key={'product-${product.id}'}>
                                           <td>{product.id}</td>
                                           <td>
-                                             <img src={product.image_url} alt="" width={50} />
+                                             {
+                                                (product.image_url == "") ? <img src="https://placeholder.co/50x50" alt="" width={50} /> : <img src={product.image_url} alt="" width={50} />  
+                                             }
+                                             
                                           </td>
                                           <td>{product.title}</td>
-                                          <td>{product.price}</td>
+                                          <td>${product.price}</td>
                                           <td>{product.qty}</td>
                                           <td>{product.sku}</td>
                                           <td>
