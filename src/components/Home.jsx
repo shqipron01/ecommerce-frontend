@@ -2,6 +2,7 @@ import React from 'react'
 import LatestProduct from './common/LatestProduct';
 import Hero from './common/Hero';
 import Layout from './common/Layout';
+import FeaturedProduct from './common/FeaturedProduct';
 
 
 const Home = () => {
@@ -10,6 +11,7 @@ const Home = () => {
         <Layout>
             <Hero />
             <LatestProduct />
+            <FeaturedProduct />
         </Layout>
     </>
   )

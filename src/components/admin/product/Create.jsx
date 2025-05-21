@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef,useMemo } from 'react'
 import Layout from '../../common/Layout'
 import { Link, useNavigate } from 'react-router-dom'
 import Sidebar from '../../common/Sidebar'
-import { set, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { adminToken, apiUrl } from '../../common/http'
 import { toast } from 'react-toastify'
 import JoditEditor from 'jodit-react'
@@ -15,6 +15,10 @@ const Create = ({placeholder}) => {
   const [disable, setDisable] = useState(false)
   const [categories, setCategories] = useState([])
   const [brands, setBrands] = useState([])
+  const [gallery, setGallery] = useState([])
+  const [sizes, setSizes] = useState([])
+  const [sizesChecked, setSizesChecked] = useState([])
+  const [galleryImages, setGalleryImages] = useState([])
   const navigate = useNavigate();
   
 
@@ -83,6 +87,21 @@ const Create = ({placeholder}) => {
     })
   }
   
+  const fetchSizes = async () => {
+    const res = await fetch(`${apiUrl}/sizes`,{
+      method: 'GET',
+      headers: {
+        'Content-type': 'application/json',
+        'Accept' : 'application/json',
+        'Authorization' : `Bearer ${adminToken()}`
+      }
+    })
+    .then(res => res.json())
+    .then(result=> {
+      setSizes(result.data)
+    })
+  }
+
   const handleFile =async (e) => {
     const formData = new FormData();
     const file = e.target.files[0];
@@ -116,6 +135,7 @@ const Create = ({placeholder}) => {
   useEffect(() => {
     fetchCategories();
     fetchBrands();
+    fetchSizes();
   },[])
 
   return (
@@ -249,12 +269,12 @@ const Create = ({placeholder}) => {
                     </div>
                     <div className='col-md-6'>
                       <div className='mb-3'>
-                        <label htmlFor="" className='form-label'>Discounted Price</label>
+                        <label htmlFor="" className='form-label'>Compare Price</label>
                         <input 
                           {
                             ...register('compare_price')
                           }
-                          type="text" placeholder='Discounted Price' className='form-control' 
+                          type="text" placeholder='Compare Price' className='form-control' 
                         />
                       </div>
                     </div>
@@ -349,6 +369,34 @@ const Create = ({placeholder}) => {
                     }
                   </div>
                   
+                  <h3 className='py-3 border-bottom mb-3'>Sizes</h3>
+                  <div className='mb-3'>
+                    {
+                      sizes && sizes.map(size => {
+                        return (
+                          <div className="form-check-inline ps-2" key={`psize-${size.id}`}>
+                            <input 
+                              {
+                                ...register('sizes')
+                              }
+                              checked={sizesChecked.includes(size.id)}
+                              onChange={(e) => {
+                                if(e.target.checked){
+                                  setSizesChecked([...sizesChecked, size.id])
+                                }else{
+                                  setSizesChecked(sizesChecked.filter(sid => size.id != sid))
+                                }
+                              }}
+                              className="form-check-input" type="checkbox" value={size.id} id={`size-${size.id}`} />
+                            <label className="form-check-label ps-2" htmlFor={`size-${size.id}`}>
+                              {size.name}
+                            </label>
+                          </div>
+                        )
+                      })
+                    }
+                  </div>
+
                   <h3 className='py-3 border-bottom mb-3'>Gallery</h3>
                   <div className='mb-3'>
                     <label htmlFor="" className='form-label'>Image</label>
@@ -360,22 +408,19 @@ const Create = ({placeholder}) => {
                   <div className='mb-3'>
                     <div className='row'>
                       {
-                        galleryImages && galleryImages.map(image, index =>{
+                        galleryImages && galleryImages.map((image, index) =>{
                           return(
                             <div className='col-md-3' key={`image-${index}`}>
                               <div className ='card shadow'>
                                 <img src={image} alt="" className='w-100' />
-                                <button className='btn btn-danger' onClick={() => deleteImage(image)}>Delete</button>
                               </div>
+                              <button className='btn btn-danger mt-2 w-100' onClick={() => deleteImage(image)}>Delete</button>
                             </div>
                           )
                         })
                       }
-
                     </div>
-
-                   </div> 
-                                                 
+                  </div> 
                 </div>
               </div>
               <button disabled={disable} type='submit' className='btn btn-primary mt-3 mb-5'>Create</button>
