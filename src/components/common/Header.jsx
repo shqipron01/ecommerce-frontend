@@ -1,10 +1,38 @@
-import React from 'react'
+// @ts-nocheck
+import React, { useEffect, useState } from 'react'
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { Link } from 'react-router-dom';
 import 'swiper/css';
+import { apiUrl } from './http';
 
 const Header = () => {
+
+    const [categories,setCategories] = useState([])
+
+    const fetchCategories = () => {
+        fetch(`${apiUrl}/get-categories`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept' : 'application/json',
+          }
+        })
+        .then(res => res.json())
+        .then(result => {
+          if(result.status == 200) {
+          setCategories(result.data)
+          } else {
+            console.log("Something went wrong");
+          }
+     
+        })
+    }
+
+    useEffect(() => {
+        fetchCategories();
+    }, [])
+
   return (
     <header className='shadow'>
         {/* <div className='bg-white color-white text-center py-1'>Your fashion partner</div> */}
@@ -17,8 +45,16 @@ const Header = () => {
                     className="ms-auto my-2 my-lg-0"
                     navbarScroll
                 >
-                    <Nav.Link href="#action1">Mens</Nav.Link>
-                    <Nav.Link href="#action2">Womens</Nav.Link>
+                    {
+                        categories && categories.map(category => {
+                            return(
+                                <Nav.Link 
+                                    key={`cat-${category.id}`}
+                                    href={`/shop?category=${category.id}`}>{category.name}
+                                </Nav.Link>
+                            )
+                        })
+                    }
                 </Nav>
                 <div className='nav-right d-flex'>
                     <Link to="/admin/login" className='ms-3'>

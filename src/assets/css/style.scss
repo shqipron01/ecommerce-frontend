@@ -52,6 +52,12 @@ ul{
     max-width: 1150px;
 }
 
+.nav-tabs{
+    .nav-link{
+        color: #061123;
+    }
+}
+
 .btn{
     &.btn-size{
         background-color: rgba(#061123, 0.03);
@@ -171,6 +177,9 @@ footer h2{
     }
     .price{
         font-weight: bold;
+        span{
+            color: rgba(#061123, 0.5);
+        }
     }
 }
 
