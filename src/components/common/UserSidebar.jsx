@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Link } from 'react-router-dom'
+import { AuthContext } from '../context/Auth';
 
 const UserSidebar = () => {
     const {logout} = useContext(AuthContext);

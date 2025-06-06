@@ -27,6 +27,9 @@ import Register from "./components/Register";
 import {default as UserLogin} from "./components/Login";
 import Profile from "./components/Profile";
 import { RequireAuth } from "./components/RequireAuth";
+import Confirmation from "./components/Confirmation";
+import ShowOrders from "./components/admin/orders/ShowOrders";
+import OrderDetail from "./components/admin/orders/OrderDetail";
 
 
 
@@ -41,13 +44,25 @@ function App() {
           <Route path='/shop' element={<Shop />}/>
           <Route path='/product/:id' element={<Product />}/>
           <Route path='/cart' element={<Cart />}/>
-          <Route path='/checkout' element={<Checkout/>} />
           <Route path ='/account/register' element={<Register/>} />
           <Route path='/account/login' element={<UserLogin/>} />
           <Route path='/admin/login' element={<Login/>} />
+          
           <Route path='/account' element={
             <RequireAuth>
               <Profile />
+            </RequireAuth>
+          } />
+
+           <Route path='/checkout' element={
+            <RequireAuth>
+              <Checkout />
+            </RequireAuth>
+          } />
+
+          <Route path='/order/confirmation/:id' element={
+            <RequireAuth>
+              <Confirmation />
             </RequireAuth>
           } />
           
@@ -87,6 +102,10 @@ function App() {
           <Route path='/admin/products/create' element={<AdminRequireAuth><CreateProduct /></AdminRequireAuth>} />
 
           <Route path='/admin/products/edit/:id' element={<AdminRequireAuth><EditProduct /></AdminRequireAuth>} />
+
+          <Route path='/admin/orders' element={<AdminRequireAuth><ShowOrders /></AdminRequireAuth>} />
+
+          <Route path='/admin/orders/:id' element={<AdminRequireAuth><OrderDetail /></AdminRequireAuth>} />
 
 
         </Routes>

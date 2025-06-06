@@ -14,7 +14,7 @@ const Profile = () => {
           {/*  <Link to="" className='btn btn-primary'>Button</Link> */}
           </div>
           <div className='col-md-3'>
-            <UserSidebarSidebar />
+            <UserSidebar />
           </div>
           <div className='col-md-9'>
             <div className='card shadow'>

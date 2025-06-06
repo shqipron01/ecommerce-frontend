@@ -8,3 +8,12 @@ export const adminToken = () => {
     const adminData = JSON.parse(data);
     return adminData.token;
 }
+
+export const userToken = () => {
+    const data = localStorage.getItem('userInfo');
+    
+    if(!data) return null;
+    
+    const adminData = JSON.parse(data);
+    return adminData.token;
+}

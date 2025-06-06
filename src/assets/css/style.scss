@@ -222,3 +222,20 @@ footer h2{
         }
     }
 }
+
+.cart-bucket {
+    position: relative;
+    span{
+        position: absolute;
+        background-color: #F97316;
+        color: #FFF;
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border-radius: 10px;
+        top: -2px;
+        right: -10px;
+        font-size: 11px;
+        text-align: center;
+    }
+}
