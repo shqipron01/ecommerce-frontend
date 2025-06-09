@@ -17,7 +17,28 @@ const Checkout = () => {
         setPaymentMethod(e.target.value);
     }
 
-    const { register, handleSubmit,setError, watch, formState: { errors }, } = useForm();
+    const { register, handleSubmit,setError, watch, reset, formState: { errors }, } = useForm({
+        defaultValues: async () => {
+              const response = await fetch(`${apiUrl}/get-profile-details`, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json',
+                  'Authorization': `Bearer ${userToken()}`
+                }
+              });
+              const result = await response.json();
+              reset ({
+                name: result.name,
+                email: result.email,
+                address: result.address,
+                mobile: result.mobile,
+                city: result.city,
+                state: result.state,
+                zip: result.zip
+              });
+            }
+    });
 
     const processOrder = (data) => {
         if(paymentMethod == 'cod'){
