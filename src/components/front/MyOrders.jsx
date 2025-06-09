@@ -1,62 +1,63 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import Layout from '../../common/Layout'
-import Loader from '../../common/Loader'
-import Sidebar from '../../common/Sidebar'
-import { apiUrl, adminToken} from '../../common/http'
-import Nostate from '../../common/Nostate'
+import Layout from '../common/Layout'
+import UserSidebar from '../common/UserSidebar'
+import { userToken, apiUrl } from '../common/http';
+import Loader from '../common/Loader'
+import Nostate from '../common/Nostate';
+import { Link } from 'react-router-dom';
 
-const ShowOrders = () => {
+const MyOrders = () => {
+    const [orders, setOrders] = useState([]);
+    const [loader, setLoader] = useState(false);
 
-  const [orders, setOrders] = useState([]);
-  const [loader, setLoader] = useState(false);
-
-  const fetchOrders = async () => {
-    setLoader(true);
-    const res = await fetch(`${apiUrl}/orders`, {
-      method: "GET",
-      headers: {
-        'Content-type' : 'application/json',
-        'Accept' : 'application/json',
-        'Authorization' : `Bearer ${adminToken()}`
+      const fetchOrders = async () => {
+        setLoader(true);
+        const res = await fetch(`${apiUrl}/get-orders`, {
+          method: "GET",
+          headers: {
+            'Content-type' : 'application/json',
+            'Accept' : 'application/json',
+            'Authorization' : `Bearer ${userToken()}`
+          }
+        })
+        .then(res => res.json())
+        .then(result => {
+          setLoader(false)
+          console.log(result);
+          if(result.status == 200){
+            setOrders(result.data);
+          }else{
+            console.log("Something went wrong")
+          }
+        })
       }
-    })
-    .then(res => res.json())
-    .then(result => {
-      setLoader(false)
-      if(result.status == 200){
-        setOrders(result.data);
-      }else{
-        console.log("Something went wrong")
-      }
-    })
-  }
+    
+      useEffect(() => {
+        fetchOrders()
+      },[]);
 
-  useEffect(() => {
-    fetchOrders()
-  },[]);
- 
   return (
     <Layout>
       <div className='container'>
         <div className='row'>
           <div className='d-flex justify-content-between mt-5 pb-3'>
-            <h4 className='h4 pb-0 mb-0'>Orders</h4>
-            {/* <Link to="" className='btn btn-primary'>Button</Link> */}
+            <h4 className='h4 pb-0 mb-0'>My Orders</h4>
+          {/*  <Link to="" className='btn btn-primary'>Button</Link> */}
           </div>
           <div className='col-md-3'>
-            <Sidebar />
+            <UserSidebar />
           </div>
           <div className='col-md-9'>
             <div className='card shadow'>
                 <div className="card-body p-4">
-                  {
+                {
                     loader == true && <Loader/>
                   }
                   {
                     loader==false && orders.length == 0 && <Nostate text="Orders not found"/>
-                  }
-                  {
+                }
+
+                {
                     orders && orders.length > 0 &&
                     <table className='table table-striped'>
                       <thead>
@@ -76,7 +77,7 @@ const ShowOrders = () => {
                             return(
                               <tr key={`order-${order.id}`}>
                                 <td>
-                                  <Link to={`/admin/orders/${order.id}`}>{order.id}</Link>
+                                  <Link to={`/account/orders/details/${order.id}`}>{order.id}</Link>
                                 </td>
                                 <td>{order.name}</td>
                                 <td>{order.email}</td>
@@ -110,7 +111,7 @@ const ShowOrders = () => {
                       </tbody>
                     </table>
                   }
-                  
+
                 </div>
             </div>
           </div>
@@ -120,4 +121,4 @@ const ShowOrders = () => {
   )
 }
 
-export default ShowOrders
+export default MyOrders
