@@ -38,7 +38,6 @@ const Header = () => {
 
   return (
     <header className='shadow'>
-        {/* <div className='bg-white color-white text-center py-1'>Your fashion partner</div> */}
         <div className='container'>
             <Navbar expand="lg" className="">
                 <Navbar.Brand href="/">Ecommerce</Navbar.Brand>

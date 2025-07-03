@@ -25,14 +25,19 @@ import {default as CreateProduct} from "./components/admin/product/Create";
 import {default as EditProduct} from "./components/admin/product/Edit";
 import Register from "./components/Register";
 import {default as UserLogin} from "./components/Login";
-import Profile from "./components/front/Profile";
+import Profile from "./components/user/Profile";
+import StripeCheckout from "./components/user/StripeCheckout";
+import StripeSuccess  from "./components/user/StripeSuccess";
+
 import { RequireAuth } from "./components/RequireAuth";
 import Confirmation from "./components/Confirmation";
 import ShowOrders from "./components/admin/orders/ShowOrders";
 import OrderDetail from "./components/admin/orders/OrderDetail";
 
-import MyOrders from "./components/front/MyOrders";
-import {default as UserOrderDetail} from "./components/front/OrderDetail";
+import MyOrders from "./components/user/MyOrders";
+import {default as UserOrderDetail} from './components/user/OrderDetial'
+import Shipping from "./components/admin/shipping/Shipping";
+import Chat from "./components/Chat";
 
 
 function App() {
@@ -49,6 +54,8 @@ function App() {
           <Route path ='/account/register' element={<Register/>} />
           <Route path='/account/login' element={<UserLogin/>} />
           <Route path='/admin/login' element={<Login/>} />
+          <Route path='/order/confirmation/stripe' element={<StripeSuccess/>} />
+          <Route path="/chat" element={<Chat />} />
           
           <Route path='/account' element={
             <RequireAuth>
@@ -79,7 +86,7 @@ function App() {
               <UserOrderDetail />
             </RequireAuth>
           } />
-          
+
           {/* Admin Routes */}
           <Route path='/admin/dashboard' element={
             <AdminRequireAuth>
@@ -120,6 +127,8 @@ function App() {
           <Route path='/admin/orders' element={<AdminRequireAuth><ShowOrders /></AdminRequireAuth>} />
 
           <Route path='/admin/orders/:id' element={<AdminRequireAuth><OrderDetail /></AdminRequireAuth>} />
+
+          <Route path='/admin/shipping' element={<AdminRequireAuth><Shipping /></AdminRequireAuth>} />
 
 
         </Routes>

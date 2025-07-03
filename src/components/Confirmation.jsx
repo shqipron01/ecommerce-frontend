@@ -4,8 +4,11 @@ import Layout from './common/Layout'
 import { apiUrl, userToken } from './common/http';
 import { Link, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useLocation } from 'react-router-dom';
+
 
 const Confirmation = () => {
+   const location = useLocation();
    const [order, setOrder] = useState([]);
    const [loading, setLoading] = useState(true);
    const [items, setItems] = useState([]);
@@ -31,8 +34,14 @@ const Confirmation = () => {
    }
 
    useEffect(() => {
+    if (location.state?.order) {
+      setOrder(location.state.order);
+      setItems(location.state.order.items || []);
+      setLoading(false);
+    } else {
       fetchOrder();
-   },[]);
+    }
+  }, [location.state, params.id]);
 
   return (
    <Layout>
@@ -74,7 +83,14 @@ const Confirmation = () => {
                                  order.status == 'cancelled' && <span className='badge bg-danger'>Cancelled</span>
                               }
                            </p>
-                           <p><strong>Payment Method: </strong> COD</p>
+                           <p>
+                              <strong>Payment Method: </strong>
+                              {order.payment_method === 'stripe'
+                                 ? 'Stripe'
+                                 : order.payment_method === 'cod'
+                                    ? 'COD'
+                                    : order.payment_method}
+                           </p>
                         </div>
                         <div className='col-6'>
                            <p><strong>Customer: </strong> {order.name}</p>
@@ -116,7 +132,7 @@ const Confirmation = () => {
                                  </tr>
                                  <tr>
                                     <td className='text-end fw-bold' colSpan={3}>Grand Total</td>
-                                    <td>${order.grand_total}</td>
+                                    <td>${order.subtotal + order.shipping}</td>
                                  </tr>
                               </tfoot>
                            </table>

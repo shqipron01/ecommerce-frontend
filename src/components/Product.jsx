@@ -94,7 +94,7 @@ const Product = () => {
                                         '--swiper-pagination-color': '#000',
                                         }}
                                         onSwiper={setThumbsSwiper}
-                                        loop={true}
+                                        loop={productImages.length > 1}
                                         direction="vertical"
                                         spaceBetween={10}
                                         slidesPerView={3}
@@ -126,7 +126,7 @@ const Product = () => {
                                     '--swiper-navigation-color': '#000',
                                     '--swiper-pagination-color': '#000',
                                     }}
-                                    loop={true}
+                                    loop={productImages.length > 1}
                                     spaceBetween={10}
                                     navigation={true}
                                     thumbs={{ swiper: thumbsSwiper }}

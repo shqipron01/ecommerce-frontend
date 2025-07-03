@@ -7,6 +7,8 @@ import { CartContext } from './context/Cart'
 import { useForm } from 'react-hook-form'
 import { apiUrl, userToken } from './common/http'
 import { toast } from 'react-toastify'
+import {loadStripe} from '@stripe/stripe-js';
+import { stripePromise } from './stripe.js';
 
 const Checkout = () => {
     const [paymentMethod, setPaymentMethod] = useState('cod');
@@ -17,27 +19,29 @@ const Checkout = () => {
         setPaymentMethod(e.target.value);
     }
 
-    const { register, handleSubmit,setError, watch, reset, formState: { errors }, } = useForm({
+    const { register, handleSubmit,setError, watch,getValues, reset, formState: { errors }, } = useForm({
         defaultValues: async () => {
-              const response = await fetch(`${apiUrl}/get-profile-details`, {
-                method: 'GET',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Accept': 'application/json',
-                  'Authorization': `Bearer ${userToken()}`
-                }
-              });
-              const result = await response.json();
-              reset ({
-                name: result.name,
-                email: result.email,
-                address: result.address,
-                mobile: result.mobile,
-                city: result.city,
-                state: result.state,
-                zip: result.zip
-              });
+            fetch(`${apiUrl}/get-profile-details`, {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${userToken()}`
             }
+            })
+            .then(res => res.json())
+            .then(result => {
+                reset({
+                    name: result.data.name,
+                    email: result.data.email,
+                    address: result.data.address,
+                    mobile: result.data.mobile,
+                    city: result.data.city,
+                    state: result.data.state,
+                    zip: result.data.zip
+                })
+            })
+        }
     });
 
     const processOrder = (data) => {
@@ -47,7 +51,7 @@ const Checkout = () => {
     }
 
     const saveOrder = (formData, paymentStatus) => {
-        const  newFormData = {...formData, 
+        const newFormData = {...formData, 
             grand_total: grandTotal(), 
             sub_total: subTotal(), 
             shipping: shipping(),
@@ -70,6 +74,65 @@ const Checkout = () => {
             if(result.status == 200){
                 localStorage.removeItem('cart')
                 navigate(`/order/confirmation/${result.id}`)
+            }else{
+                toast.error(result.message)
+            }
+        })
+    }
+
+    const makePayment = async () => {
+        const stripe = await stripePromise;
+
+        const formValues = getValues();
+        const productIds = cartData.map(item => parseInt(item.id));
+        if (!formValues.email || !productIds.length) {
+            toast.error('Email and cart must be provided.');
+            return;
+        }
+       
+
+        localStorage.setItem('orderData', JSON.stringify({
+            name: formValues.name,
+            email: formValues.email,
+            address: formValues.address,
+            city: formValues.city,
+            state: formValues.state,
+            zip: formValues.zip,
+            mobile: formValues.mobile,
+            contact: formValues.mobile,
+            cart: cartData
+        }));
+
+        const formData = {
+            email: formValues.email,
+            product_id: productIds,
+            cart: cartData
+        };
+
+        fetch(`${apiUrl}/make-payment`,{
+            
+            method: 'POST',
+            headers: {
+                'Content-type' : 'application/json',
+                'Accept' : 'application/json',
+                'Authorization' : `Bearer ${userToken()}`
+            },
+            body: JSON.stringify({
+                email: formValues.email,
+                name: formValues.name,
+                address: formValues.address,
+                city: formValues.city,
+                state: formValues.state,
+                zip: formValues.zip,
+                mobile: formValues.mobile,
+                product_id: productIds,
+                cart: cartData
+            })
+        })
+        .then(res => res.json())
+        .then(result => {
+            if(result.url){
+                window.location.href = result.url;
             }else{
                 toast.error(result.message)
             }
@@ -264,20 +327,25 @@ const Checkout = () => {
                         <div className='pt-2'>
                             <input type="radio" 
                                 onClick={handlePaymentMethod}
-                                defaultChecked={paymentMethod == 'stripe'} 
+                                checked={paymentMethod === 'stripe'} 
+                                onChange={handlePaymentMethod}
                                 value={'stripe'} 
                             />
                             <label className='form-label ps-2'>Stripe</label>
                             <input type="radio" 
                                 onClick={handlePaymentMethod}
-                                defaultChecked={paymentMethod == 'nod'} 
-                                value={'nod'} 
+                                checked={paymentMethod === 'cod'} 
+                                onChange={handlePaymentMethod}
+                                value={'cod'} 
                                 className='ms-3' 
                             />
-                            <label className='form-label ps-2' >NOD</label>
+                            <label className='form-label ps-2' >COD</label>
                         </div>
                         <div className='d-flex py-3'>
-                            <button className='btn btn-primary'>Pay Now</button>
+                            <button
+                                onClick={paymentMethod === 'stripe' ? makePayment : undefined} 
+                                className='btn btn-primary'
+                            >Pay Now</button>
                         </div>
                     </div>
                 </div>

@@ -6,36 +6,36 @@ import { useParams } from 'react-router-dom'
 import { userToken, apiUrl } from '../common/http'
 
 const OrderDetial = () => {
-    const [order, setOrder] = useState([])
-    const [items, setItems] = useState([])
-    const [loader, setLoader] = useState(false);
-    const params = useParams();
+   const [order, setOrder] = useState([])
+   const [items, setItems] = useState([])
+   const [loader, setLoader] = useState(false);
+   const params = useParams();
 
-    const fetchOrder = async () => {
-          setLoader(true);
-          const res = await fetch(`${apiUrl}/get-order-details/${params.id}`, {
-          method: "GET",
-          headers: {
-             'Content-type' : 'application/json',
-             'Accept' : 'application/json',
-             'Authorization' : `Bearer ${userToken()}`
-          }
-          })
-          .then(res => res.json())
-          .then(result => {
-             setLoader(false)
-             if(result.status == 200){
-                setOrder(result.data);
-                setItems(result.data.items)
-             }else{
-                console.log("Something went wrong")
-             }
-          })
-       }
+   const fetchOrder = async () => {
+      setLoader(true);
+      const res = await fetch(`${apiUrl}/get-order-details/${params.id}`, {
+         method: "GET",
+         headers: {
+            'Content-type' : 'application/json',
+            'Accept' : 'application/json',
+            'Authorization' : `Bearer ${userToken()}`
+         }
+      })
+      .then(res => res.json())
+      .then(result => {
+         setLoader(false)
+         if(result.status == 200){
+            setOrder(result.data);
+            setItems(result.data.items)
+         }else{
+            console.log("Something went wrong")
+         }
+      })
+   }
 
-       useEffect(() => {
-       fetchOrder();
-       },[]);
+   useEffect(() => {
+      fetchOrder();
+   },[]);
 
   return (
    <Layout>
@@ -49,7 +49,7 @@ const OrderDetial = () => {
             <UserSidebar />
           </div>
           <div className='col-md-9'>
-            <div className='card shadow'>
+            <div className='card shadow mb-5'>
                  <div className="card-body p-4">
                         {
                            loader == true && <Loader />

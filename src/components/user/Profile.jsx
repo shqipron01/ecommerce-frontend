@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import Layout from './common/Layout'
-import Sidebar from './common/Sidebar'
+import Layout from '../common/Layout'
+import Sidebar from '../common/Sidebar'
+import Loader from '../common/Loader'
 import { Link } from 'react-router-dom'
-import UserSidebar from './common/UserSidebar'
+import UserSidebar from '../common/UserSidebar'
 import { useForm } from 'react-hook-form'
 import { apiUrl, userToken } from '../common/http'
 import { toast } from 'react-toastify'
@@ -19,47 +20,51 @@ const Profile = () => {
     formState:{ errors },
   } = useForm({
     defaultValues: async () => {
-      const response = await fetch(`${apiUrl}/get-profile-details`, {
+      fetch(`${apiUrl}/get-profile-details`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-type': 'application/json',
           'Accept': 'application/json',
           'Authorization': `Bearer ${userToken()}`
         }
-      });
-      const result = await response.json();
-      setLoading(false);
-      reset ({
-        name: result.name,
-        email: result.email,
-        address: result.address,
-        mobile: result.mobile,
-        city: result.city,
-        state: result.state,
-        zip: result.zip
-      });
+      })
+      .then(res => res.json())
+      .then(result => {
+        setLoading(false)
+        reset({
+          name: result.data.name,
+          email: result.data.email,
+          address: result.data.address,
+          mobile: result.data.mobile,
+          city: result.data.city,
+          state: result.data.state,
+          zip: result.data.zip
+        })
+      })
     }
   });
 
-  const updateAccount =async (data) => {
-    const response = await fetch(`${apiUrl}/update-profile`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${userToken()}`
-        },
-        body: JSON.stringify(data)
-      });
-    const result = await response.json();
-    if (result.status === 200) {
-      toast.success(result.message);
-    } else {
-      const formErrors = result.errors;
-      Object.keys(formErrors).forEach(field => {
-        setError(field, { message: formErrors[field][0] });
-      });
-    }
+  const updateAccount = async (data) => {
+    fetch(`${apiUrl}/update-profile`, {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${userToken()}`
+      },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(result => {
+      if (result.status == 200) {
+        toast.success(result.message)
+      } else {
+        const formErrors = result.errors;
+        Object.keys(formErrors).forEach((field) => {
+          setError(field, { message: formErrors[field][0] });
+        });
+      }
+    });
   }
 
   return (
@@ -80,7 +85,7 @@ const Profile = () => {
             {
             loading == false &&
             <form onSubmit={handleSubmit(updateAccount)}>
-            <div className='card shadow'>
+              <div className='card shadow'>
                 <div className="card-body p-4">
                   <div className='row'>
                     <div className='mb-3 col-md-6'>
@@ -95,17 +100,17 @@ const Profile = () => {
                         placeholder='Enter your name' />
                         {errors.name && (<p className='text-danger'>{errors.name?.message}</p>)}
                     </div>
-                     <div className='mb-3 col-md-6'>
+                      <div className='mb-3 col-md-6'>
                       <label htmlFor="email" className='form-label'>Email</label>
                       <input 
                       {
-                             ...register('email', {
-                                required: "The email field is required",
-                                pattern: {
-                               value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                              message: "Invalid email address"
-                             }
-                          })
+                        ...register('email', {
+                          required: "The email field is required",
+                          pattern: {
+                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                            message: "Invalid email address"
+                          }
+                        })
                       }
                       type="text" 
                       id='email'
@@ -148,7 +153,7 @@ const Profile = () => {
                       }
                       type="text" 
                       id='city'
-                       className={`form-control ${errors.city && 'is-invalid'}`}  
+                        className={`form-control ${errors.city && 'is-invalid'}`}  
                       placeholder='Enter your city' />
                       {errors.city && (<p className='text-danger'>{errors.city?.message}</p>)}
                     </div>
@@ -162,7 +167,7 @@ const Profile = () => {
                       }
                       type="text" 
                       id='state' 
-                       className={`form-control ${errors.state && 'is-invalid'}`}   
+                        className={`form-control ${errors.state && 'is-invalid'}`}   
                       placeholder='Enter your state' />
                       {errors.state && (<p className='text-danger'>{errors.state?.message}</p>)}
                     </div>
@@ -174,13 +179,13 @@ const Profile = () => {
                       }
                       type="text" 
                       id='zip'
-                       className={`form-control ${errors.zip && 'is-invalid'}`}   
+                        className={`form-control ${errors.zip && 'is-invalid'}`}   
                       placeholder='Enter your zip' />
                       {errors.zip && (<p className='text-danger'>{errors.zip?.message}</p>)}
                     </div>
                   </div>
                 </div>
-            </div>
+              </div>
             <button className='btn btn-primary mt-4 mb-5'>Update</button>
             </form>
             }

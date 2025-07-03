@@ -29,7 +29,8 @@ const Login = () => {
                 const userInfo = {
                     token: result.token,
                     id: result.id,
-                    name: result.name
+                    name: result.name,
+                    role: result.role
                 };
                 localStorage.setItem('userInfo', JSON.stringify(userInfo));
                 login(userInfo);
